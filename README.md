@@ -201,6 +201,65 @@ response = requests.post(
 print(response.json())
 ```
 
+## Running Tests
+
+The project includes comprehensive tests with mocked Gemini API responses and real test databases.
+
+### Prerequisites
+
+Install test dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Running Tests with Test Databases
+
+Use the provided script that manages test databases:
+```bash
+./run_tests.sh
+```
+
+Or manually:
+
+1. Start test databases:
+```bash
+docker compose -f docker-compose-tests.yml up -d
+```
+
+2. Run tests:
+```bash
+pytest -v
+```
+
+3. Stop test databases:
+```bash
+docker compose -f docker-compose-tests.yml down
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py          # Test fixtures and configuration
+├── test_controllers.py  # API endpoint tests with mocked Gemini
+├── test_database.py     # Database operations tests
+└── test_models.py       # Pydantic model validation tests
+```
+
+**Key Features:**
+- **Mocked Gemini API**: Tests don't call the real Gemini API
+- **Real Databases**: Uses PostgreSQL and Redis test instances via Docker
+- **Isolated Tests**: Each test gets a fresh database session
+- **Comprehensive Coverage**: Tests for all endpoints, models, and database operations
+
+### Test Databases
+
+The test suite uses separate database instances:
+- **PostgreSQL**: Port 5433 (vs 5432 for dev)
+- **Redis**: Port 6380 (vs 6379 for dev)
+
+Configuration is in `docker-compose-tests.yml`.
+
 ## License
 
 See LICENSE file for details.
