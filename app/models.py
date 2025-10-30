@@ -1,5 +1,6 @@
 """Pydantic models for API request/response."""
 from pydantic import BaseModel, Field
+from typing import Literal
 
 
 class GeminiRequest(BaseModel):
@@ -20,17 +21,16 @@ class GeminiRequest(BaseModel):
 class GeminiResponse(BaseModel):
     """Response model for Gemini API endpoint."""
     
-    hash: str = Field(..., description="Hash identifier from the request")
-    expected: str = Field(..., description="Expected value from the request")
-    response: str = Field(..., description="Response from Gemini API")
-    cached: bool = Field(..., description="Whether the response was served from cache")
+    badge: Literal['TRUSTED', 'UNTRUSTED', 'UNKNOWN'] = Field(
+        ..., 
+        description="Trust badge classification"
+    )
+    details: str = Field(..., description="Details from Gemini API analysis")
     
     class Config:
         json_schema_extra = {
             "example": {
-                "hash": "abc123def456",
-                "expected": "some expected value",
-                "response": "Gemini API response text",
-                "cached": False
+                "badge": "TRUSTED",
+                "details": "Analysis details from Gemini API"
             }
         }

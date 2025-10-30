@@ -71,7 +71,7 @@ async def call_gemini(
         db: Database session dependency
         
     Returns:
-        GeminiResponse with the API response and cache status
+        GeminiResponse with badge classification and details
     """
     hash_key = request.hash
     
@@ -79,10 +79,8 @@ async def call_gemini(
     cached_data = redis_client.get_cache(hash_key)
     if cached_data:
         return GeminiResponse(
-            hash=request.hash,
-            expected=request.expected,
-            response=cached_data["response"],
-            cached=True
+            badge=cached_data["badge"],
+            details=cached_data["details"]
         )
     
     # Check PostgreSQL cache (persistent storage)
@@ -93,19 +91,20 @@ async def call_gemini(
     
     if db_cache:
         # Store in Redis for faster subsequent access
-        cache_data = {"response": db_cache.response}
+        cache_data = {
+            "badge": db_cache.badge,
+            "details": db_cache.details
+        }
         redis_client.set_cache(hash_key, cache_data)
         
         return GeminiResponse(
-            hash=request.hash,
-            expected=request.expected,
-            response=db_cache.response,
-            cached=True
+            badge=db_cache.badge,
+            details=db_cache.details
         )
     
     # Not in cache, call Gemini API
     try:
-        gemini_response = gemini_service.generate_response(
+        badge, details = gemini_service.generate_response(
             hash_value=request.hash,
             expected_value=request.expected
         )
@@ -116,23 +115,25 @@ async def call_gemini(
         )
     
     # Cache the response in both Redis and PostgreSQL
-    cache_data = {"response": gemini_response}
+    cache_data = {
+        "badge": badge,
+        "details": details
+    }
     redis_client.set_cache(hash_key, cache_data)
     
     # Store in PostgreSQL
     new_cache = GeminiCache(
         hash=hash_key,
         expected=request.expected,
-        response=gemini_response
+        badge=badge,
+        details=details
     )
     db.add(new_cache)
     db.commit()
     
     return GeminiResponse(
-        hash=request.hash,
-        expected=request.expected,
-        response=gemini_response,
-        cached=False
+        badge=badge,
+        details=details
     )
 
 

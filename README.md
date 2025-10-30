@@ -31,12 +31,17 @@ Calls the Gemini API with a custom prompt. Responses are cached to avoid overcal
 **Response:**
 ```json
 {
-  "hash": "unique_identifier",
-  "expected": "expected_value_or_context",
-  "response": "Gemini API response text",
-  "cached": false
+  "badge": "TRUSTED",
+  "details": "Detailed analysis from Gemini API"
 }
 ```
+
+**Response Fields:**
+- `badge`: Trust classification, one of:
+  - `TRUSTED`: The data is classified as trusted
+  - `UNTRUSTED`: The data is classified as untrusted
+  - `UNKNOWN`: Unable to determine trust level
+- `details`: Detailed analysis and reasoning from Gemini API
 
 ## Setup
 
@@ -136,23 +141,30 @@ backend/
 
 ## Customizing the Gemini Prompt
 
+The Gemini API is configured to perform security analysis and classify data as TRUSTED, UNTRUSTED, or UNKNOWN.
+
 To customize the prompt sent to Gemini API, edit the `generate_response` method in `app/gemini_service.py`:
 
 ```python
 prompt = f"""
-Your custom prompt here...
+Your custom security analysis prompt here...
 Hash: {hash_value}
 Expected: {expected_value}
+
+Format your response as:
+CLASSIFICATION: [TRUSTED/UNTRUSTED/UNKNOWN]
+DETAILS: [Your detailed analysis]
 """
 ```
 
 ## Cache Behavior
 
-1. **First Request**: Calls Gemini API, stores response in both Redis and PostgreSQL
+1. **First Request**: Calls Gemini API, stores badge and details in both Redis and PostgreSQL
 2. **Subsequent Requests**: 
    - Checks Redis first (fast, in-memory)
    - Falls back to PostgreSQL if not in Redis
    - Only calls Gemini API if not found in either cache
+3. **Cached responses** return the same badge and details as the original API call
 
 ## Testing the API
 
