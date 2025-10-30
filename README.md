@@ -54,16 +54,34 @@ Calls the Gemini API with a custom prompt. Responses are cached to avoid overcal
 
 ### Installation
 
+#### Quick Start with Makefile
+
+```bash
+# Install Poetry in a virtual environment
+make install-poetry
+
+# Install dependencies
+make install
+
+# Run development server
+make dev
+
+# Run tests
+make test
+```
+
 #### Option 1: Using Poetry (Recommended)
 
 1. Install Poetry if not already installed:
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
+# Or use Makefile: make install-poetry
 ```
 
 2. Install dependencies:
 ```bash
 poetry install
+# Or use Makefile: make install
 ```
 
 3. Activate the virtual environment:
@@ -82,6 +100,25 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+### Makefile Commands
+
+The project includes a Makefile for common tasks:
+
+```bash
+make help            # Show available commands
+make install-poetry  # Install Poetry in a virtual environment
+make install         # Install dependencies with Poetry
+make dev             # Run development server with hot reload
+make run             # Run production server
+make test            # Run tests with test databases
+make lint            # Run linters (ruff, black)
+make format          # Format code with black and isort
+make docker-up       # Start Docker services
+make docker-down     # Stop Docker services
+make clean           # Clean up generated files
+make build           # Build project with Poetry
 ```
 
 ### Environment Configuration

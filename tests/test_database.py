@@ -84,6 +84,9 @@ def test_hash_primary_key_constraint(test_db_session):
     test_db_session.add(entry1)
     test_db_session.commit()
     
+    # Expunge to avoid identity conflict
+    test_db_session.expunge(entry1)
+    
     # Try to insert another entry with same hash
     entry2 = GeminiCache(
         hash="duplicate_hash",

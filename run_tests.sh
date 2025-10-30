@@ -24,8 +24,8 @@ done
 echo "Databases are ready!"
 echo "Running tests..."
 
-# Run pytest
-pytest -v --tb=short
+# Run pytest with Poetry
+poetry run pytest -v --tb=short
 
 TEST_EXIT_CODE=$?
 
