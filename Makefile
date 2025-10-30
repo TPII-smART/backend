@@ -21,12 +21,12 @@ help:
 # Install Poetry in a virtual environment
 install-poetry:
 	@echo "Creating virtual environment for Poetry..."
-	python3 -m venv .poetry-venv
+	python3 -m venv .venv
 	@echo "Installing Poetry..."
-	.poetry-venv/bin/pip install --upgrade pip
-	.poetry-venv/bin/pip install poetry
-	@echo "Poetry installed! Use '.poetry-venv/bin/poetry' or add to PATH"
-	@echo "Or run: source .poetry-venv/bin/activate && poetry --version"
+	.venv/bin/pip install --upgrade pip
+	.venv/bin/pip install poetry
+	@echo "Poetry installed! Use '.venv/bin/poetry' or add to PATH"
+	@echo "Or run: source .venv/bin/activate && poetry --version"
 
 # Create virtual environment and install dependencies
 install:
