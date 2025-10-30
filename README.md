@@ -69,6 +69,13 @@ CORS_ORIGINS=*
 CORS_CREDENTIALS=true
 CORS_METHODS=*
 CORS_HEADERS=*
+
+# Optional: Configure Database Connection Pool
+DB_POOL_SIZE=5
+DB_MAX_OVERFLOW=10
+DB_POOL_TIMEOUT=30
+DB_POOL_RECYCLE=3600
+DB_POOL_PRE_PING=true
 ```
 
 **CORS Configuration Options:**
@@ -77,6 +84,13 @@ CORS_HEADERS=*
 - `CORS_CREDENTIALS`: Allow credentials (true/false)
 - `CORS_METHODS`: Allowed HTTP methods. Use `*` for all, or comma-separated list: `GET,POST,PUT`
 - `CORS_HEADERS`: Allowed headers. Use `*` for all, or comma-separated list
+
+**Database Pool Configuration Options:**
+- `DB_POOL_SIZE`: Number of connections to maintain in the pool (default: 5)
+- `DB_MAX_OVERFLOW`: Maximum number of connections that can be created beyond pool_size (default: 10)
+- `DB_POOL_TIMEOUT`: Seconds to wait before giving up on getting a connection from the pool (default: 30)
+- `DB_POOL_RECYCLE`: Seconds after which a connection is automatically recycled (default: 3600)
+- `DB_POOL_PRE_PING`: Enable connection health checks before using (default: true)
 
 ### Option 1: Docker Compose (Recommended)
 
