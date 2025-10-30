@@ -1,8 +1,7 @@
 """Database configuration and models."""
-from sqlalchemy import create_engine, Column, String, Text, DateTime
+from sqlalchemy import create_engine, Column, String, Text, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 from app.config import settings
 
 # Create SQLAlchemy engine
@@ -23,8 +22,8 @@ class GeminiCache(Base):
     hash = Column(String, primary_key=True, index=True)
     expected = Column(String, nullable=False)
     response = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
 def init_db():

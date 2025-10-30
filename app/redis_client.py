@@ -1,8 +1,11 @@
 """Redis client configuration."""
 import redis
 import json
+import logging
 from typing import Optional
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class RedisClient:
@@ -33,7 +36,7 @@ class RedisClient:
                 return json.loads(cached_data)
             return None
         except Exception as e:
-            print(f"Redis get error: {e}")
+            logger.error(f"Redis get error: {e}")
             return None
     
     def set_cache(self, key: str, value: dict, expire: int = 3600):
@@ -48,7 +51,7 @@ class RedisClient:
         try:
             self.client.setex(key, expire, json.dumps(value))
         except Exception as e:
-            print(f"Redis set error: {e}")
+            logger.error(f"Redis set error: {e}")
     
     def delete_cache(self, key: str):
         """
@@ -60,7 +63,7 @@ class RedisClient:
         try:
             self.client.delete(key)
         except Exception as e:
-            print(f"Redis delete error: {e}")
+            logger.error(f"Redis delete error: {e}")
 
 
 # Global Redis client instance
