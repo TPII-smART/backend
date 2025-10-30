@@ -20,7 +20,6 @@ class GeminiCache(Base):
     __tablename__ = "gemini_cache"
     
     hash = Column(String, primary_key=True, index=True)
-    expected = Column(String, nullable=False)
     badge = Column(String, nullable=False)
     details = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())

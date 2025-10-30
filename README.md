@@ -126,7 +126,8 @@ Once the application is running, visit:
 backend/
 ├── app/
 │   ├── __init__.py           # Package marker
-│   ├── main.py               # FastAPI application and endpoints
+│   ├── main.py               # FastAPI application setup
+│   ├── controllers.py        # API endpoint controllers
 │   ├── models.py             # Pydantic models for request/response
 │   ├── config.py             # Configuration and settings
 │   ├── database.py           # PostgreSQL database setup
