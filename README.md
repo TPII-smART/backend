@@ -133,6 +133,11 @@ cp .env.example .env
 # Required: Add your Gemini API key
 GEMINI_API_KEY=your_actual_api_key_here
 
+# Database Configuration (if using local PostgreSQL instead of Docker)
+# Replace 'postgres' with your PostgreSQL username
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+
 # Optional: Configure CORS (default allows all origins)
 CORS_ENABLED=true
 CORS_ORIGINS=*
@@ -147,6 +152,10 @@ DB_POOL_TIMEOUT=30
 DB_POOL_RECYCLE=3600
 DB_POOL_PRE_PING=true
 ```
+
+**Note**: If you encounter `role "postgres" does not exist` error when running `make dev`, you need to:
+- Either use Docker: `make docker-up` (recommended)
+- Or update `POSTGRES_USER` in `.env` to match your local PostgreSQL username (often your system username)
 
 **CORS Configuration Options:**
 - `CORS_ENABLED`: Enable/disable CORS (true/false)

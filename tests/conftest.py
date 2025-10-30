@@ -68,10 +68,12 @@ def mock_gemini_service():
         yield mock_service
 
 
-@pytest.fixture
-def mock_redis_client():
-    """Mock Redis client for isolated testing."""
-    with patch("app.controllers.redis_client") as mock_redis:
-        mock_redis.get_cache.return_value = None
-        mock_redis.set_cache.return_value = None
-        yield mock_redis
+@pytest.fixture(scope="function")
+def clean_redis():
+    """Clean Redis test database before each test."""
+    from app.redis_client import redis_client
+    # Clear all keys in the test Redis database
+    redis_client.client.flushdb()
+    yield
+    # Clean up after test
+    redis_client.client.flushdb()

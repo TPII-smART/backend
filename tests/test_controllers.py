@@ -21,7 +21,7 @@ def test_health_endpoint(client):
     assert data["status"] == "healthy"
 
 
-def test_gemini_endpoint_with_mock(client, mock_gemini_service, test_db_session):
+def test_gemini_endpoint_with_mock(client, mock_gemini_service, clean_redis, test_db_session):
     """Test Gemini endpoint with mocked API response."""
     # Configure mock to return specific response
     mock_gemini_service.generate_response.return_value = ("TRUSTED", "Test analysis details")
@@ -53,7 +53,7 @@ def test_gemini_endpoint_with_mock(client, mock_gemini_service, test_db_session)
     assert cached_entry.details == "Test analysis details"
 
 
-def test_gemini_endpoint_untrusted_response(client, mock_gemini_service, test_db_session):
+def test_gemini_endpoint_untrusted_response(client, mock_gemini_service, clean_redis, test_db_session):
     """Test Gemini endpoint returns UNTRUSTED classification."""
     mock_gemini_service.generate_response.return_value = ("UNTRUSTED", "Suspicious activity detected")
     
@@ -68,7 +68,7 @@ def test_gemini_endpoint_untrusted_response(client, mock_gemini_service, test_db
     assert data["details"] == "Suspicious activity detected"
 
 
-def test_gemini_endpoint_unknown_response(client, mock_gemini_service, test_db_session):
+def test_gemini_endpoint_unknown_response(client, mock_gemini_service, clean_redis, test_db_session):
     """Test Gemini endpoint returns UNKNOWN classification."""
     mock_gemini_service.generate_response.return_value = ("UNKNOWN", "Unable to classify")
     
@@ -83,7 +83,7 @@ def test_gemini_endpoint_unknown_response(client, mock_gemini_service, test_db_s
     assert data["details"] == "Unable to classify"
 
 
-def test_gemini_endpoint_cache_from_database(client, mock_gemini_service, test_db_session):
+def test_gemini_endpoint_cache_from_database(client, mock_gemini_service, clean_redis, test_db_session):
     """Test that cached data is retrieved from database."""
     # First, insert data directly into database
     cached_entry = GeminiCache(
@@ -134,11 +134,11 @@ def test_gemini_endpoint_invalid_badge_value(client, test_db_session):
     assert response.status_code in [200, 500]  # 500 if mock not set up
 
 
-def test_multiple_requests_same_hash(client, mock_gemini_service, test_db_session):
+def test_multiple_requests_same_hash(client, mock_gemini_service, clean_redis, test_db_session):
     """Test multiple requests with same hash use cache."""
     mock_gemini_service.generate_response.return_value = ("TRUSTED", "First response")
     
-    # First request - should call API
+    # First request - should call API and store in Redis and PostgreSQL
     response1 = client.post(
         "/gemini",
         json={"hash": "same_hash", "expected": "value1"}
@@ -146,13 +146,13 @@ def test_multiple_requests_same_hash(client, mock_gemini_service, test_db_sessio
     assert response1.status_code == 200
     assert mock_gemini_service.generate_response.call_count == 1
     
-    # Second request with same hash - should use cache
+    # Second request with same hash - should use Redis cache
     response2 = client.post(
         "/gemini",
         json={"hash": "same_hash", "expected": "value2"}
     )
     assert response2.status_code == 200
-    # Should still be 1 because second request uses cache
+    # Should still be 1 because second request uses Redis cache
     assert mock_gemini_service.generate_response.call_count == 1
     
     # Both responses should have same data from cache
