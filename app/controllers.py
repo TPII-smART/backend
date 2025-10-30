@@ -78,8 +78,9 @@ async def call_gemini(
             expected_value=request.expected
         )
     except Exception as e:
+        # Raise 503 for Gemini API errors (will be caught by middleware)
         raise HTTPException(
-            status_code=500,
+            status_code=503,
             detail=f"Failed to call Gemini API: {str(e)}"
         )
     

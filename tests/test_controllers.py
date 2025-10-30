@@ -131,7 +131,8 @@ def test_gemini_endpoint_invalid_badge_value(client, test_db_session):
     )
     
     # Response should still work because Gemini service is mocked
-    assert response.status_code in [200, 500]  # 500 if mock not set up
+    # 503 if Gemini service fails (not mocked), 200 if successful
+    assert response.status_code in [200, 503]
 
 
 def test_multiple_requests_same_hash(client, mock_gemini_service, clean_redis, test_db_session):

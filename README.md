@@ -10,6 +10,8 @@ A FastAPI service that integrates with Google's Gemini API, using Redis and Post
   - Redis for fast in-memory caching
   - PostgreSQL for persistent storage
 - **Pydantic Models**: Type-safe request/response validation
+- **RFC 9457 Error Handling**: Standardized error responses following Problem Details specification
+- **Service Error Handling**: Gemini API errors return 503 Service Unavailable
 - **CORS Support**: Configurable via environment variables for cross-origin requests
 - **Swagger Documentation**: Auto-generated API documentation at `/docs`
 - **Docker Support**: Easy deployment with Docker Compose
@@ -216,6 +218,55 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 Once the application is running, visit:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+
+## Error Handling
+
+The API follows **RFC 9457** (Problem Details for HTTP APIs) for consistent error responses.
+
+### Error Response Format
+
+All errors return a standardized JSON structure with `Content-Type: application/problem+json`:
+
+```json
+{
+  "type": "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Specific error description",
+  "instance": "/api/endpoint"
+}
+```
+
+### Error Status Codes
+
+- **422 Unprocessable Entity**: Validation errors (missing or invalid request fields)
+- **404 Not Found**: Endpoint not found
+- **503 Service Unavailable**: Gemini API is unavailable or failed to respond
+- **500 Internal Server Error**: Unexpected server errors
+
+### Example Error Responses
+
+**Validation Error (422):**
+```json
+{
+  "type": "https://datatracker.ietf.org/doc/html/rfc4918#section-11.2",
+  "title": "Validation Error",
+  "status": 422,
+  "detail": "hash: field required; expected: field required",
+  "instance": "/gemini"
+}
+```
+
+**Service Unavailable (503):**
+```json
+{
+  "type": "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.4",
+  "title": "Service Unavailable",
+  "status": 503,
+  "detail": "Gemini API is currently unavailable",
+  "instance": "/gemini"
+}
+```
 
 ## Project Structure
 
