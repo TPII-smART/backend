@@ -10,6 +10,7 @@ A FastAPI service that integrates with Google's Gemini API, using Redis and Post
   - Redis for fast in-memory caching
   - PostgreSQL for persistent storage
 - **Pydantic Models**: Type-safe request/response validation
+- **CORS Support**: Configurable via environment variables for cross-origin requests
 - **Swagger Documentation**: Auto-generated API documentation at `/docs`
 - **Docker Support**: Easy deployment with Docker Compose
 
@@ -52,10 +53,25 @@ Calls the Gemini API with a custom prompt. Responses are cached to avoid overcal
 cp .env.example .env
 ```
 
-2. Edit `.env` and add your Gemini API key:
+2. Edit `.env` and configure the application:
 ```env
+# Required: Add your Gemini API key
 GEMINI_API_KEY=your_actual_api_key_here
+
+# Optional: Configure CORS (default allows all origins)
+CORS_ENABLED=true
+CORS_ORIGINS=*
+CORS_CREDENTIALS=true
+CORS_METHODS=*
+CORS_HEADERS=*
 ```
+
+**CORS Configuration Options:**
+- `CORS_ENABLED`: Enable/disable CORS (true/false)
+- `CORS_ORIGINS`: Allowed origins. Use `*` for all, or comma-separated list: `http://localhost:3000,https://example.com`
+- `CORS_CREDENTIALS`: Allow credentials (true/false)
+- `CORS_METHODS`: Allowed HTTP methods. Use `*` for all, or comma-separated list: `GET,POST,PUT`
+- `CORS_HEADERS`: Allowed headers. Use `*` for all, or comma-separated list
 
 ### Option 1: Docker Compose (Recommended)
 

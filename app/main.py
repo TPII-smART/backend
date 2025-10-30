@@ -1,5 +1,6 @@
 """FastAPI application main module."""
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from contextlib import asynccontextmanager
 
@@ -7,6 +8,7 @@ from app.models import GeminiRequest, GeminiResponse
 from app.database import get_db, init_db, GeminiCache
 from app.redis_client import redis_client
 from app.gemini_service import gemini_service
+from app.config import settings
 
 
 @asynccontextmanager
@@ -27,6 +29,16 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+
+# Configure CORS
+if settings.CORS_ENABLED:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins_list,
+        allow_credentials=settings.CORS_CREDENTIALS,
+        allow_methods=settings.cors_methods_list,
+        allow_headers=settings.cors_headers_list,
+    )
 
 
 @app.get("/")

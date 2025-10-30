@@ -24,6 +24,34 @@ class Settings(BaseSettings):
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
     
+    # CORS Configuration
+    CORS_ENABLED: bool = True
+    CORS_ORIGINS: str = "*"
+    CORS_CREDENTIALS: bool = True
+    CORS_METHODS: str = "*"
+    CORS_HEADERS: str = "*"
+    
+    @property
+    def cors_origins_list(self) -> list:
+        """Parse CORS origins from comma-separated string."""
+        if self.CORS_ORIGINS == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+    
+    @property
+    def cors_methods_list(self) -> list:
+        """Parse CORS methods from comma-separated string."""
+        if self.CORS_METHODS == "*":
+            return ["*"]
+        return [method.strip() for method in self.CORS_METHODS.split(",")]
+    
+    @property
+    def cors_headers_list(self) -> list:
+        """Parse CORS headers from comma-separated string."""
+        if self.CORS_HEADERS == "*":
+            return ["*"]
+        return [header.strip() for header in self.CORS_HEADERS.split(",")]
+    
     @property
     def database_url(self) -> str:
         """Construct PostgreSQL connection URL."""
