@@ -48,8 +48,41 @@ Calls the Gemini API with a custom prompt. Responses are cached to avoid overcal
 ### Prerequisites
 
 - Python 3.11+
+- Poetry (for dependency management) or pip
 - Docker and Docker Compose (for containerized setup)
 - Google Gemini API key
+
+### Installation
+
+#### Option 1: Using Poetry (Recommended)
+
+1. Install Poetry if not already installed:
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+2. Install dependencies:
+```bash
+poetry install
+```
+
+3. Activate the virtual environment:
+```bash
+poetry shell
+```
+
+#### Option 2: Using pip
+
+1. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
 ### Environment Configuration
 
@@ -113,17 +146,21 @@ docker-compose down
 
 ### Option 2: Local Development
 
-1. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-2. Start PostgreSQL and Redis (using Docker):
+1. Start PostgreSQL and Redis (using Docker):
 ```bash
 docker-compose up postgres redis -d
 ```
 
-3. Run the application:
+2. Run the application:
+
+**Using Poetry:**
+```bash
+poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# Or use the Poetry script
+poetry run dev
+```
+
+**Using pip/venv:**
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
@@ -147,9 +184,17 @@ backend/
 │   ├── database.py           # PostgreSQL database setup
 │   ├── redis_client.py       # Redis client wrapper
 │   └── gemini_service.py     # Gemini API integration
+├── tests/                    # Test suite
+│   ├── conftest.py           # Test fixtures
+│   ├── test_controllers.py   # API endpoint tests
+│   ├── test_database.py      # Database tests
+│   └── test_models.py        # Model validation tests
 ├── docker-compose.yml        # Docker services configuration
+├── docker-compose-tests.yml  # Test databases configuration
 ├── Dockerfile                # Application container definition
-├── requirements.txt          # Python dependencies
+├── pyproject.toml            # Poetry configuration and dependencies
+├── requirements.txt          # Python dependencies (pip)
+├── pytest.ini                # Pytest configuration
 ├── .env.example              # Example environment variables
 └── README.md                 # This file
 ```
@@ -208,6 +253,13 @@ The project includes comprehensive tests with mocked Gemini API responses and re
 ### Prerequisites
 
 Install test dependencies:
+
+**Using Poetry:**
+```bash
+poetry install --with dev
+```
+
+**Using pip:**
 ```bash
 pip install -r requirements.txt
 ```
@@ -227,6 +279,13 @@ docker compose -f docker-compose-tests.yml up -d
 ```
 
 2. Run tests:
+
+**Using Poetry:**
+```bash
+poetry run pytest -v
+```
+
+**Using pip/venv:**
 ```bash
 pytest -v
 ```
