@@ -62,18 +62,20 @@ def client(test_db_session):
 @pytest.fixture
 def mock_gemini_service():
     """Mock the Gemini service to avoid API calls."""
+    from unittest.mock import AsyncMock
     with patch("app.controllers.gemini_service") as mock_service:
-        # Default mock response
-        mock_service.generate_response.return_value = ("TRUSTED", "This is a test response from mocked Gemini API")
+        # Default mock response (must be AsyncMock for async methods)
+        mock_service.generate_response = AsyncMock(return_value=("TRUSTED", "This is a test response from mocked Gemini API"))
         yield mock_service
 
 
 @pytest.fixture(scope="function")
-def clean_redis():
+async def clean_redis():
     """Clean Redis test database before each test."""
     from app.redis_client import redis_client
     # Clear all keys in the test Redis database
-    redis_client.client.flushdb()
+    client = redis_client.get_client()
+    await client.flushdb()
     yield
     # Clean up after test
-    redis_client.client.flushdb()
+    await client.flushdb()

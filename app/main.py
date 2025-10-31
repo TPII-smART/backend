@@ -48,8 +48,14 @@ if settings.CORS_ENABLED:
 app.middleware("http")(error_handler_middleware)
 
 # Add exception handlers for RFC 9457 compliant error responses
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
-app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(
+    RequestValidationError,
+    validation_exception_handler  # type: ignore
+)
+app.add_exception_handler(
+    StarletteHTTPException,
+    http_exception_handler  # type: ignore
+)
 
 # Include API router
 app.include_router(router)
