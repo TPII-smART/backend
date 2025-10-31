@@ -74,7 +74,7 @@ async def clean_redis():
     """Clean Redis test database before each test."""
     from app.redis_client import redis_client
     # Clear all keys in the test Redis database
-    client = redis_client._get_client()
+    client = redis_client.get_client()
     await client.flushdb()
     yield
     # Clean up after test

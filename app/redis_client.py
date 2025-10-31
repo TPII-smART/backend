@@ -22,10 +22,11 @@ class RedisClient:
     def _get_client(self) -> redis.Redis:
         """Get or create Redis client for current event loop."""
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             loop_id = id(loop)
         except RuntimeError:
-            # No event loop, create a new client
+            # No event loop running, use a default client
+            # This should only happen in synchronous contexts
             loop_id = 0
         
         if loop_id not in self._client_cache:
@@ -36,6 +37,10 @@ class RedisClient:
                 decode_responses=True
             )
         return self._client_cache[loop_id]
+
+    def get_client(self) -> redis.Redis:
+        """Public method to get Redis client for testing purposes."""
+        return self._get_client()
 
     async def get_cache(self, key: str) -> Optional[dict]:
         """
