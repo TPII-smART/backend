@@ -28,7 +28,7 @@ class RedisClient:
             # No event loop running, use a default client
             # This should only happen in synchronous contexts
             loop_id = 0
-        
+
         if loop_id not in self._client_cache:
             self._client_cache[loop_id] = redis.Redis(
                 host=self._host,
@@ -62,7 +62,7 @@ class RedisClient:
             logger.error(f"Redis get error: {e}")
             return None
 
-    async def set_cache(self, key: str, value: dict, expire: int = 1):
+    async def set_cache(self, key: str, value: dict, expire: int = 3600):
         """
         Store response in Redis cache.
 
