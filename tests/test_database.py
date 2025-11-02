@@ -7,8 +7,8 @@ from app.database import GeminiCache
 def test_create_cache_entry(test_db_session):
     """Test creating a cache entry in the database."""
     entry = GeminiCache(
-        hash="test_hash_1",
-        badge="TRUSTED",
+        id="db-test-1",
+        badge="MATCHS WITH DESCRIPTION",
         details="Test details for database entry"
     )
     test_db_session.add(entry)
@@ -16,12 +16,12 @@ def test_create_cache_entry(test_db_session):
     
     # Query back the entry
     retrieved = test_db_session.query(GeminiCache).filter(
-        GeminiCache.hash == "test_hash_1"
+        GeminiCache.id == "db-test-1"
     ).first()
     
     assert retrieved is not None
-    assert retrieved.hash == "test_hash_1"
-    assert retrieved.badge == "TRUSTED"
+    assert retrieved.id == "db-test-1"
+    assert retrieved.badge == "MATCHS WITH DESCRIPTION"
     assert retrieved.details == "Test details for database entry"
     assert isinstance(retrieved.created_at, datetime)
     assert isinstance(retrieved.updated_at, datetime)
@@ -31,7 +31,7 @@ def test_update_cache_entry(test_db_session):
     """Test updating an existing cache entry."""
     # Create entry
     entry = GeminiCache(
-        hash="update_test",
+        id="update_test",
         badge="UNKNOWN",
         details="Initial details"
     )
@@ -39,46 +39,46 @@ def test_update_cache_entry(test_db_session):
     test_db_session.commit()
     
     # Update entry
-    entry.badge = "TRUSTED"
+    entry.badge = "MATCHS WITH DESCRIPTION"
     entry.details = "Updated details"
     test_db_session.commit()
     
     # Verify update
     retrieved = test_db_session.query(GeminiCache).filter(
-        GeminiCache.hash == "update_test"
+        GeminiCache.id == "update_test"
     ).first()
     
-    assert retrieved.badge == "TRUSTED"
+    assert retrieved.badge == "MATCHS WITH DESCRIPTION"
     assert retrieved.details == "Updated details"
 
 
 def test_query_by_hash(test_db_session):
-    """Test querying cache entries by hash."""
+    """Test querying cache entries by id."""
     # Create multiple entries
     entries = [
-        GeminiCache(hash="hash1", badge="TRUSTED", details="Details 1"),
-        GeminiCache(hash="hash2", badge="UNTRUSTED", details="Details 2"),
-        GeminiCache(hash="hash3", badge="UNKNOWN", details="Details 3"),
+        GeminiCache(id="db-test-query-1", badge="MATCHS WITH DESCRIPTION", details="Details 1"),
+        GeminiCache(id="db-test-query-2", badge="NEEDS REVISION", details="Details 2"),
+        GeminiCache(id="db-test-query-3", badge="UNKNOWN", details="Details 3"),
     ]
     for entry in entries:
         test_db_session.add(entry)
     test_db_session.commit()
     
-    # Query specific hash
+    # Query specific id
     result = test_db_session.query(GeminiCache).filter(
-        GeminiCache.hash == "hash2"
+        GeminiCache.id == "db-test-query-2"
     ).first()
     
     assert result is not None
-    assert result.badge == "UNTRUSTED"
+    assert result.badge == "NEEDS REVISION"
     assert result.details == "Details 2"
 
 
 def test_hash_primary_key_constraint(test_db_session):
-    """Test that hash is unique (primary key constraint)."""
+    """Test that id is unique (primary key constraint)."""
     entry1 = GeminiCache(
-        hash="duplicate_hash",
-        badge="TRUSTED",
+        id="duplicate_id",
+        badge="MATCHS WITH DESCRIPTION",
         details="First entry"
     )
     test_db_session.add(entry1)
@@ -87,10 +87,10 @@ def test_hash_primary_key_constraint(test_db_session):
     # Expunge to avoid identity conflict
     test_db_session.expunge(entry1)
     
-    # Try to insert another entry with same hash
+    # Try to insert another entry with same id
     entry2 = GeminiCache(
-        hash="duplicate_hash",
-        badge="UNTRUSTED",
+        id="duplicate_id",
+        badge="NEEDS REVISION",
         details="Second entry"
     )
     test_db_session.add(entry2)
@@ -102,8 +102,8 @@ def test_hash_primary_key_constraint(test_db_session):
 def test_delete_cache_entry(test_db_session):
     """Test deleting a cache entry."""
     entry = GeminiCache(
-        hash="delete_test",
-        badge="TRUSTED",
+        id="delete_test",
+        badge="MATCHS WITH DESCRIPTION",
         details="To be deleted"
     )
     test_db_session.add(entry)
@@ -115,7 +115,7 @@ def test_delete_cache_entry(test_db_session):
     
     # Verify deletion
     result = test_db_session.query(GeminiCache).filter(
-        GeminiCache.hash == "delete_test"
+        GeminiCache.id == "delete_test"
     ).first()
     
     assert result is None
@@ -123,11 +123,11 @@ def test_delete_cache_entry(test_db_session):
 
 def test_all_badge_types(test_db_session):
     """Test storing all three badge types."""
-    badges = ["TRUSTED", "UNTRUSTED", "UNKNOWN"]
+    badges = ["MATCHS WITH DESCRIPTION", "NEEDS REVISION", "UNKNOWN"]
     
     for i, badge in enumerate(badges):
         entry = GeminiCache(
-            hash=f"badge_test_{i}",
+            id=f"badge_test_{i}",
             badge=badge,
             details=f"Details for {badge}"
         )
@@ -138,6 +138,6 @@ def test_all_badge_types(test_db_session):
     # Verify all were stored
     for i, badge in enumerate(badges):
         result = test_db_session.query(GeminiCache).filter(
-            GeminiCache.hash == f"badge_test_{i}"
+            GeminiCache.id == f"badge_test_{i}"
         ).first()
         assert result.badge == badge
