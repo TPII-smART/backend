@@ -79,7 +79,7 @@ def test_gemini_response_invalid_badge():
 def test_gemini_response_missing_details():
     """Test GeminiResponse validation fails without details."""
     with pytest.raises(ValidationError) as exc_info:
-        GeminiResponse(badge="TRUSTED")
+        GeminiResponse(badge="MATCHS WITH DESCRIPTION")
     
     errors = exc_info.value.errors()
     assert any(error["loc"] == ("details",) for error in errors)
