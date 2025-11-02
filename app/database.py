@@ -25,8 +25,8 @@ class GeminiCache(Base):
     """Database model for caching Gemini API responses."""
     
     __tablename__ = "gemini_cache"
-    
-    hash = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
+    # hash = Column(Text, primary_key=True, index=True)
     badge = Column(String, nullable=False)
     details = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())

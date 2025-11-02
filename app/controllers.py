@@ -44,10 +44,11 @@ async def call_gemini(
     Returns:
         GeminiResponse with badge classification and details
     """
-    hash_key = request.hash
+    hash_keys = [h.replace("ipfs://", "") for h in request.hashes]
+    work_id = request.workId
 
     # Check Redis cache first (fastest)
-    cached_data = await redis_client.get_cache(hash_key)
+    cached_data = await redis_client.get_cache(work_id)
     if cached_data:
         return GeminiResponse(
             badge=cached_data["badge"],
@@ -55,7 +56,7 @@ async def call_gemini(
         )
 
     # Check PostgreSQL cache (persistent storage)
-    stmt = select(GeminiCache).where(GeminiCache.hash == hash_key)
+    stmt = select(GeminiCache).where(GeminiCache.id == work_id)
     db_cache = db.execute(stmt).first()
 
     if db_cache:
@@ -65,7 +66,7 @@ async def call_gemini(
             "badge": db_cache.badge,
             "details": db_cache.details
         }
-        await redis_client.set_cache(hash_key, cache_data)
+        await redis_client.set_cache(work_id, cache_data)
 
         return GeminiResponse(
             badge=db_cache.badge,  # type: ignore
@@ -75,7 +76,7 @@ async def call_gemini(
     # Not in cache, call Gemini API
     try:
         badge, details = await gemini_service.generate_response(
-            hash_value=request.hash,
+            hashes=hash_keys,
             expected_value=request.expected
         )
     except Exception as e:
@@ -90,11 +91,11 @@ async def call_gemini(
         "badge": badge,
         "details": details
     }
-    await redis_client.set_cache(hash_key, cache_data)
+    await redis_client.set_cache(work_id, cache_data)
 
     # Store in PostgreSQL
     new_cache = GeminiCache(
-        hash=hash_key,
+        id=work_id,
         badge=badge,
         details=details
     )
