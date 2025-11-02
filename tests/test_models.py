@@ -7,48 +7,50 @@ from app.models import GeminiRequest, GeminiResponse
 def test_gemini_request_valid():
     """Test creating a valid GeminiRequest."""
     request = GeminiRequest(
-        hash="test_hash_123",
+        workId="gig-0-1-1",
+        hashes=["ipfs://test_hash_123"],
         expected="test_expected_value"
     )
-    assert request.hash == "test_hash_123"
+    assert request.workId == "gig-0-1-1"
+    assert request.hashes == ["ipfs://test_hash_123"]
     assert request.expected == "test_expected_value"
 
 
 def test_gemini_request_missing_hash():
-    """Test GeminiRequest validation fails without hash."""
+    """Test GeminiRequest validation fails without hashes."""
     with pytest.raises(ValidationError) as exc_info:
-        GeminiRequest(expected="test_value")
+        GeminiRequest(workId="gig-0-1-1", expected="test_value")
     
     errors = exc_info.value.errors()
-    assert any(error["loc"] == ("hash",) for error in errors)
+    assert any(error["loc"] == ("hashes",) for error in errors)
 
 
 def test_gemini_request_missing_expected():
     """Test GeminiRequest validation fails without expected."""
     with pytest.raises(ValidationError) as exc_info:
-        GeminiRequest(hash="test_hash")
+        GeminiRequest(workId="gig-0-1-1", hashes=["ipfs://test_hash"])
     
     errors = exc_info.value.errors()
     assert any(error["loc"] == ("expected",) for error in errors)
 
 
 def test_gemini_response_trusted():
-    """Test creating a GeminiResponse with TRUSTED badge."""
+    """Test creating a GeminiResponse with MATCHS WITH DESCRIPTION badge."""
     response = GeminiResponse(
-        badge="TRUSTED",
+        badge="MATCHS WITH DESCRIPTION",
         details="This is trusted data"
     )
-    assert response.badge == "TRUSTED"
+    assert response.badge == "MATCHS WITH DESCRIPTION"
     assert response.details == "This is trusted data"
 
 
 def test_gemini_response_untrusted():
-    """Test creating a GeminiResponse with UNTRUSTED badge."""
+    """Test creating a GeminiResponse with NEEDS REVISION badge."""
     response = GeminiResponse(
-        badge="UNTRUSTED",
+        badge="NEEDS REVISION",
         details="This is untrusted data"
     )
-    assert response.badge == "UNTRUSTED"
+    assert response.badge == "NEEDS REVISION"
     assert response.details == "This is untrusted data"
 
 
@@ -85,8 +87,8 @@ def test_gemini_response_missing_details():
 
 def test_gemini_models_json_serialization():
     """Test that models can be serialized to JSON."""
-    request = GeminiRequest(hash="test", expected="value")
-    response = GeminiResponse(badge="TRUSTED", details="Test details")
+    request = GeminiRequest(workId="gig-0-1-1", hashes=["ipfs://test"], expected="value")
+    response = GeminiResponse(badge="MATCHS WITH DESCRIPTION", details="Test details")
     
     # Test serialization
     request_json = request.model_dump()
@@ -94,5 +96,6 @@ def test_gemini_models_json_serialization():
     
     assert isinstance(request_json, dict)
     assert isinstance(response_json, dict)
-    assert request_json["hash"] == "test"
-    assert response_json["badge"] == "TRUSTED"
+    assert request_json["workId"] == "gig-0-1-1"
+    assert request_json["hashes"] == ["ipfs://test"]
+    assert response_json["badge"] == "MATCHS WITH DESCRIPTION"

@@ -24,24 +24,24 @@ def test_validation_error_rfc9457(client):
     assert data["status"] == 422
     assert data["title"] == "Validation Error"
     assert data["instance"] == "/gemini"
-    assert "hash" in data["detail"] or "expected" in data["detail"]
+    assert "workId" in data["detail"] or "hashes" in data["detail"] or "expected" in data["detail"]
 
 
 def test_validation_error_missing_hash(client):
-    """Test validation error when hash is missing."""
-    response = client.post("/gemini", json={"expected": "test"})
+    """Test validation error when hashes is missing."""
+    response = client.post("/gemini", json={"workId": "gig-0-1-1", "expected": "test"})
     
     assert response.status_code == 422
     data = response.json()
     
     assert data["status"] == 422
     assert data["title"] == "Validation Error"
-    assert "hash" in data["detail"]
+    assert "hashes" in data["detail"]
 
 
 def test_validation_error_missing_expected(client):
     """Test validation error when expected is missing."""
-    response = client.post("/gemini", json={"hash": "test123"})
+    response = client.post("/gemini", json={"workId": "gig-0-1-1", "hashes": ["ipfs://test123"]})
     
     assert response.status_code == 422
     data = response.json()
@@ -74,7 +74,7 @@ def test_gemini_api_error_returns_503(client, mock_gemini_service, clean_redis, 
     
     response = client.post(
         "/gemini",
-        json={"hash": "error_hash", "expected": "test_value"}
+        json={"workId": "gig-0-1-8", "hashes": ["ipfs://error_hash"], "expected": "test_value"}
     )
     
     assert response.status_code == 503
@@ -92,11 +92,11 @@ def test_gemini_api_error_returns_503(client, mock_gemini_service, clean_redis, 
 
 def test_successful_request_no_error_response(client, mock_gemini_service, clean_redis, test_db_session):
     """Test that successful requests don't have error format."""
-    mock_gemini_service.generate_response.return_value = ("TRUSTED", "Test response")
+    mock_gemini_service.generate_response.return_value = ("MATCHS WITH DESCRIPTION", "Test response")
     
     response = client.post(
         "/gemini",
-        json={"hash": "success_hash", "expected": "test_value"}
+        json={"workId": "gig-0-1-9", "hashes": ["ipfs://success_hash"], "expected": "test_value"}
     )
     
     assert response.status_code == 200
