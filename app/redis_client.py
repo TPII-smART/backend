@@ -17,6 +17,8 @@ class RedisClient:
         self._host = settings.REDIS_HOST
         self._port = settings.REDIS_PORT
         self._db = settings.REDIS_DB
+        self._user = settings.REDIS_USER
+        self._password = settings.REDIS_PASSWORD
         self._client_cache = {}
 
     def _get_client(self) -> redis.Redis:
@@ -30,12 +32,18 @@ class RedisClient:
             loop_id = 0
 
         if loop_id not in self._client_cache:
-            self._client_cache[loop_id] = redis.Redis(
-                host=self._host,
-                port=self._port,
-                db=self._db,
-                decode_responses=True
-            )
+            kwargs = {
+                "host": self._host,
+                "port": self._port,
+                "db": self._db,
+                "decode_responses": True
+            }
+            if self._user:
+                kwargs["username"] = self._user
+            if self._password:
+                kwargs["password"] = self._password
+
+            self._client_cache[loop_id] = redis.Redis(**kwargs)
         return self._client_cache[loop_id]
 
     def get_client(self) -> redis.Redis:
