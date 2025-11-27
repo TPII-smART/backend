@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "gemini_cache"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
+    POSTGRES_URL: str | None = None
 
     # Database Pool Configuration
     DB_POOL_SIZE: int = 5
@@ -64,6 +65,9 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         """Construct PostgreSQL connection URL."""
+        if self.POSTGRES_URL:
+            return self.POSTGRES_URL.replace("postgres://", "postgresql://")
+
         return (
             f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
