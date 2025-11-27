@@ -1,4 +1,10 @@
 {
+	"build": {
+		"env": {
+			"ENABLE_VC_BUILD_CACHE": "1"
+		}
+	},
+	"installCommand": "pip install -r requirements.txt",
 	"rewrites": [
 		{
 			"source": "/(.*)",
