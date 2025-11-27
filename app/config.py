@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     REDIS_DB: int = 0
     REDIS_USER: str = ""
     REDIS_PASSWORD: str = ""
+    REDIS_URL: str | None = None
+
+    # Gemini API Configuration
 
     # Gemini API Configuration
     GEMINI_API_KEY: str = ""
