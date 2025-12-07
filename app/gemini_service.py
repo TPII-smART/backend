@@ -12,7 +12,7 @@ class GeminiService:
     def __init__(self):
         """Initialize Gemini client."""
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        self.model_id = "gemini-2.5-flash"
+        self.model_id = "gemini-2.5-flash-lite"
 
     def get_prompt(self, expected: str) -> str:
         """Generate prompt for Gemini API based on hash and expected value."""
